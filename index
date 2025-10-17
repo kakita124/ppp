@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICCI Admin - Gestión de Solicitudes Estudiantiles</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #6b7280;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-color: #f5f7fa;
+            --dark-color: #2c3e50;
+            --gray-color: #95a5a6;
+            --white: #ffffff;
+            --shadow: 0 2px 10px rgba(0,0,0,0.05);
+            --border-radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 256px;
+            background-color: var(--white);
+            border-right: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            z-index: 30;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            padding: 8px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+
+        .logo-icon i {
+            color: var(--white);
+            font-size: 18px;
+        }
+
+        .logo-text {
+            display: flex;
+            align-items: baseline;
+            gap: 2px;
+        }
+
+        .logo-main {
+            font-weight: bold;
+            font-size: 20px;
+            letter-spacing: -0.025em;
+        }
+
+        .logo-sub {
+            font-weight: bold;
+            font-size: 20px;
+            color: var(--primary-color);
+            letter-spacing: -0.025em;
+        }
+
+        .sidebar-description {
+            font-size: 12px;
+            color: var(--secondary-color);
+            margin-top: 8px;
+        }
+
+        .nav {
+            flex: 1;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-button {
+            width: 100%;
+            justify-content: flex-start;
+            gap: 12px;
+            height: 44px;
+            padding: 0 12px;
+            border: none;
+            border-radius: var(--border-radius);
+            background-color: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #374151;
+            transition: all 0.2s;
+        }
+
+        .nav-button:hover {
+            background-color: #f3f4f6;
+        }
+
+        .nav-button.active {
+            background: linear-gradient(90deg, var(--primary-color), #60a5fa);
+            color: var(--white);
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-label {
+            flex: 1;
+            text-align: left;
+        }
+
+        .badge {
+            margin-left: auto;
+            background-color: var(--white);
+            color: var(--primary-color);
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .help-card {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .help-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #1e40af;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: var(--secondary-color);
+            margin-bottom: 12px;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--secondary-color);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .logout-button {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: none;
+            background-color: transparent;
+            color: var(--secondary-color);
+            cursor: pointer;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .logout-button:hover {
+            background-color: #f3f4f6;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            margin-left: 256px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin: 0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .stat-card.pending {
+            border-left-color: var(--warning-color);
+        }
+
+        .stat-card.approved {
+            border-left-color: var(--success-color);
+        }
+
+        .stat-card.rejected {
+            border-left-color: var(--danger-color);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--gray-color);
+            font-size: 0.9rem;
+        }
+
+        .filters {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-label {
+            font-size: 0.8rem;
+            color: var(--gray-color);
+            font-weight: 500;
+        }
+
+        .filter-select, .filter-input {
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            min-width: 150px;
+        }
+
+        .filter-input {
+            min-width: 200px;
+        }
+
+        .table-container {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #f8f9fa;
+        }
+
+        tr {
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .email {
+            font-size: 0.8rem;
+            color: var(--gray-color);
+            margin-top: 2px;
+        }
+
+        .courses-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .course-tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .more-courses {
+            color: var(--gray-color);
+            font-size: 0.75rem;
+        }
+
+        .request-types {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .request-type {
+            background: #f3e5f5;
+            color: #7b1fa2;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .professor-select, .status-select {
+            padding: 6px 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            min-width: 150px;
+            background-color: var(--white);
+        }
+
+        .status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status.approved {
+            background-color: #d1edff;
+            color: #0c5460;
+        }
+
+        .status.rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.observed {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background-color: var(--white);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .action-btn:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            width: 500px;
+            max-width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-color);
+        }
+
+        .modal-content {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .detail-row {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-professor-select {
+            padding: 6px 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            min-width: 200px;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 220px;
+            }
+            
+            .main-content {
+                margin-left: 220px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            body {
+                flex-direction: column;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .filters {
+                flex-direction: column;
+            }
+            
+            .filter-select, .filter-input {
+                min-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-main">ICCI</span>
+                    <span class="logo-sub">Admin</span>
+                </div>
+            </div>
+            <p class="sidebar-description">
+                Gestión Académica
+            </p>
+        </div>
+
+        <nav class="nav">
+            <button class="nav-button" data-tab="dashboard">
+                <i class="fas fa-home nav-icon"></i>
+                <span class="nav-label">Dashboard</span>
+            </button>
+            <button class="nav-button active" data-tab="solicitudes">
+                <i class="fas fa-file-alt nav-icon"></i>
+                <span class="nav-label">Solicitudes</span>
+                <span class="badge" id="request-count">3</span>
+            </button>
+            <button class="nav-button" data-tab="mallas">
+                <i class="fas fa-book-open nav-icon"></i>
+                <span class="nav-label">Mallas</span>
+            </button>
+            <button class="nav-button" data-tab="ramos">
+                <i class="fas fa-book-open nav-icon"></i>
+                <span class="nav-label">Ramos</span>
+            </button>
+            <button class="nav-button" data-tab="profesores">
+                <i class="fas fa-users nav-icon"></i>
+                <span class="nav-label">Profesores</span>
+            </button>
+            <button class="nav-button" data-tab="configuracion">
+                <i class="fas fa-cog nav-icon"></i>
+                <span class="nav-label">Configuración</span>
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="help-card">
+                <h4 class="help-title">¿Necesitas ayuda?</h4>
+                <p class="help-text">
+                    Contacta con soporte técnico
+                </p>
+                <div class="status">
+                    <div class="status-dot"></div>
+                    <span class="status-text">Disponible 24/7</span>
+                </div>
+            </div>
+            <button class="logout-button">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="page-title">Gestión de Solicitudes Estudiantiles</h1>
+            <div class="user-info">
+                <div class="user-avatar">A</div>
+                <span>Administrador</span>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-value">3</div>
+                <div class="stat-label">Total Solicitudes</div>
+            </div>
+            <div class="stat-card pending">
+                <div class="stat-value">2</div>
+                <div class="stat-label">Pendientes</div>
+            </div>
+            <div class="stat-card approved">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Aprobadas</div>
+            </div>
+            <div class="stat-card rejected">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Rechazadas</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <div class="filter-group">
+                <label class="filter-label">Estado</label>
+                <select class="filter-select" id="filter-estado">
+                    <option value="">Todos los estados</option>
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Aprobada">Aprobada</option>
+                    <option value="Rechazada">Rechazada</option>
+                    <option value="Aprobada con observaciones">Aprobada con obs.</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Tipo de Solicitud</label>
+                <select class="filter-select" id="filter-tipo">
+                    <option value="">Todos los tipos</option>
+                    <option value="Tomar ramos">Tomar ramos</option>
+                    <option value="Cambiar de sección">Cambiar de sección</option>
+                    <option value="Botar un ramo">Botar un ramo</option>
+                    <option value="Cambiar ramos">Cambiar ramos</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Malla</label>
+                <select class="filter-select" id="filter-malla">
+                    <option value="">Todas las mallas</option>
+                    <option value="IC05">Malla antigua - IC05</option>
+                    <option value="IC07">Malla nueva - IC07</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Profesor</label>
+                <select class="filter-select" id="filter-profesor">
+                    <option value="">Todos los profesores</option>
+                    <option value="Juan Pérez">Juan Pérez</option>
+                    <option value="María González">María González</option>
+                    <option value="Carlos López">Carlos López</option>
+                    <option value="Ana Martínez">Ana Martínez</option>
+                    <option value="Pedro Rodríguez">Pedro Rodríguez</option>
+                    <option value="Laura Sánchez">Laura Sánchez</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Buscar</label>
+                <input type="text" class="filter-input" id="filter-search" placeholder="Nombre, RUT o email...">
+            </div>
+        </div>
+
+        <!-- Requests Table -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>RUT</th>
+                        <th>Estudiante</th>
+                        <th>Malla</th>
+                        <th>Ramos</th>
+                        <th>Tipo</th>
+                        <th>Profesor</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="requests-table-body">
+                    <!-- Las solicitudes se cargarán aquí dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Request Detail Modal -->
+    <div class="modal-overlay" id="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Solicitud de Estudiante</h3>
+                <button class="close-btn" id="close-modal">×</button>
+            </div>
+            <div class="modal-content" id="modal-content">
+                <!-- El contenido del modal se cargará aquí dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de ejemplo
+        const requests = [
+            {
+                id: 1,
+                rut: "23447879-3",
+                nombre: "Javier",
+                apellido: "Lagos",
+                email: "Javier.Lagos@ucentral.cl",
+                malla: "Malla antigua - IC05",
+                ramos: ["Transversal"],
+                tipoSolicitud: ["Cambiar de sección"],
+                situacion: "Solicitud de cambio de sección",
+                estado: "Pendiente",
+                profesorEncargado: "Juan Pérez",
+                fecha: "03/09/2025"
+            },
+            {
+                id: 2,
+                rut: "21174822-1",
+                nombre: "Max",
+                apellido: "Barra",
+                email: "Max.Barra@alumnos.ucentral.cl",
+                malla: "Malla antigua - IC05",
+                ramos: ["Taller Integrador I", "Cálculo 1"],
+                tipoSolicitud: ["Cambiar ramos", "Cambiar de sección"],
+                situacion: "Necesito mover cálculo 1 teoría a cualquier otra sección",
+                estado: "Pendiente",
+                comentarios: "No hay cupos para cambiar cálculo I",
+                profesorEncargado: "María González",
+                fecha: "04/09/2025"
+            },
+            {
+                id: 3,
+                rut: "116221276-9",
+                nombre: "Lui",
+                apellido: "Cerca",
+                email: "lui.cercab@ucen.cl",
+                malla: "Malla antigua - IC05",
+                ramos: ["Cálculo II", "Electricidad y Magnetismo", "Redes de Datos"],
+                tipoSolicitud: ["Tomar ramos", "Cambiar de sección"],
+                situacion: "Cambiar a sección 40 de cálculo 2",
+                estado: "Aprobada con observaciones",
+                comentarios: "Se ha cambiado sección de Cálculo y teoría de Electricidad",
+                profesorEncargado: "Carlos López",
+                fecha: "03/09/2025"
+            }
+        ];
+
+        const profesores = [
+            "Juan Pérez",
+            "María González", 
+            "Carlos López",
+            "Ana Martínez",
+            "Pedro Rodríguez",
+            "Laura Sánchez"
+        ];
+
+        // Estado de la aplicación
+        let filters = {
+            estado: '',
+            tipoSolicitud: '',
+            malla: '',
+            profesor: '',
+            search: ''
+        };
+
+        let selectedRequest = null;
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            renderRequestsTable();
+            setupEventListeners();
+            updateStats();
+        });
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Filtros
+            document.getElementById('filter-estado').addEventListener('change', function(e) {
+                filters.estado = e.target.value;
+                renderRequestsTable();
+            });
+            
+            document.getElementById('filter-tipo').addEventListener('change', function(e) {
+                filters.tipoSolicitud = e.target.value;
+                renderRequestsTable();
+            });
+            
+            document.getElementById('filter-malla').addEventListener('change', function(e) {
+                filters.malla = e.target.value;
+                renderRequestsTable();
+            });
+            
+            document.getElementById('filter-profesor').addEventListener('change', function(e) {
+                filters.profesor = e.target.value;
+                renderRequestsTable();
+            });
+            
+            document.getElementById('filter-search').addEventListener('input', function(e) {
+                filters.search = e.target.value;
+                renderRequestsTable();
+            });
+
+            // Navegación del sidebar
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    // Aquí podrías cambiar el contenido principal según la pestaña seleccionada
+                });
+            });
+
+            // Cerrar modal
+            document.getElementById('close-modal').addEventListener('click', function() {
+                document.getElementById('modal-overlay').style.display = 'none';
+            });
+
+            // Cerrar modal al hacer clic fuera
+            document.getElementById('modal-overlay').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                }
+            });
+        }
+
+        // Renderizar la tabla de solicitudes
+        function renderRequestsTable() {
+            const tableBody = document.getElementById('requests-table-body');
+            const filteredRequests = filterRequests();
+            
+            tableBody.innerHTML = '';
+            
+            filteredRequests.forEach(request => {
+                const row = document.createElement('tr');
+                
+                // RUT
+                const rutCell = document.createElement('td');
+                rutCell.textContent = request.rut;
+                row.appendChild(rutCell);
+                
+                // Estudiante
+                const studentCell = document.createElement('td');
+                studentCell.innerHTML = `
+                    ${request.nombre} ${request.apellido}
+                    <div class="email">${request.email}</div>
+                `;
+                row.appendChild(studentCell);
+                
+                // Malla
+                const mallaCell = document.createElement('td');
+                mallaCell.textContent = request.malla.includes('IC05') ? 'IC05' : 'IC07';
+                row.appendChild(mallaCell);
+                
+                // Ramos
+                const ramosCell = document.createElement('td');
+                ramosCell.innerHTML = `
+                    <div class="courses-list">
+                        ${request.ramos.slice(0, 2).map(ramo => 
+                            `<span class="course-tag">${ramo}</span>`
+                        ).join('')}
+                        ${request.ramos.length > 2 ? 
+                            `<span class="more-courses">+${request.ramos.length - 2}</span>` : ''
+                        }
+                    </div>
+                `;
+                row.appendChild(ramosCell);
+                
+                // Tipo de solicitud
+                const tipoCell = document.createElement('td');
+                tipoCell.innerHTML = `
+                    <div class="request-types">
+                        ${request.tipoSolicitud.slice(0, 2).map(tipo => 
+                            `<span class="request-type">${tipo}</span>`
+                        ).join('')}
+                    </div>
+                `;
+                row.appendChild(tipoCell);
+                
+                // Profesor
+                const profesorCell = document.createElement('td');
+                profesorCell.innerHTML = `
+                    <select class="professor-select" data-id="${request.id}">
+                        <option value="">Sin asignar</option>
+                        ${profesores.map(profesor => 
+                            `<option value="${profesor}" ${request.profesorEncargado === profesor ? 'selected' : ''}>${profesor}</option>`
+                        ).join('')}
+                    </select>
+                `;
+                row.appendChild(profesorCell);
+                
+                // Estado
+                const estadoCell = document.createElement('td');
+                estadoCell.innerHTML = `
+                    <span class="status ${getStatusClass(request.estado)}">${request.estado}</span>
+                `;
+                row.appendChild(estadoCell);
+                
+                // Fecha
+                const fechaCell = document.createElement('td');
+                fechaCell.textContent = request.fecha;
+                row.appendChild(fechaCell);
+                
+                // Acciones
+                const accionesCell = document.createElement('td');
+                accionesCell.innerHTML = `
+                    <div class="actions">
+                        <button class="action-btn view-btn" data-id="${request.id}">Ver</button>
+                        <select class="status-select" data-id="${request.id}">
+                            <option value="Pendiente" ${request.estado === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                            <option value="Aprobada" ${request.estado === 'Aprobada' ? 'selected' : ''}>Aprobada</option>
+                            <option value="Rechazada" ${request.estado === 'Rechazada' ? 'selected' : ''}>Rechazada</option>
+                            <option value="Aprobada con observaciones" ${request.estado === 'Aprobada con observaciones' ? 'selected' : ''}>Aprobada con obs.</option>
+                        </select>
+                    </div>
+                `;
+                row.appendChild(accionesCell);
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Añadir event listeners a los botones y selects recién creados
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    showRequestDetails(id);
+                });
+            });
+            
+            document.querySelectorAll('.status-select').forEach(select => {
+                select.addEventListener('change', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    updateRequestStatus(id, this.value);
+                });
+            });
+            
+            document.querySelectorAll('.professor-select').forEach(select => {
+                select.addEventListener('change', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    updateRequestProfessor(id, this.value);
+                });
+            });
+            
+            updateStats();
+        }
+
+        // Filtrar solicitudes
+        function filterRequests() {
+            return requests.filter(request => {
+                return (
+                    (filters.estado === '' || request.estado === filters.estado) &&
+                    (filters.tipoSolicitud === '' || request.tipoSolicitud.includes(filters.tipoSolicitud)) &&
+                    (filters.malla === '' || request.malla.includes(filters.malla)) &&
+                    (filters.profesor === '' || request.profesorEncargado === filters.profesor) &&
+                    (filters.search === '' || 
+                        request.nombre.toLowerCase().includes(filters.search.toLowerCase()) ||
+                        request.apellido.toLowerCase().includes(filters.search.toLowerCase()) ||
+                        request.rut.includes(filters.search))
+                );
+            });
+        }
+
+        // Obtener clase CSS para el estado
+        function getStatusClass(estado) {
+            switch(estado) {
+                case 'Pendiente': return 'pending';
+                case 'Aprobada': return 'approved';
+                case 'Rechazada': return 'rejected';
+                case 'Aprobada con observaciones': return 'observed';
+                default: return '';
+            }
+        }
+
+        // Mostrar detalles de la solicitud
+        function showRequestDetails(id) {
+            const request = requests.find(r => r.id === id);
+            if (!request) return;
+            
+            document.getElementById('modal-title').textContent = `Solicitud de ${request.nombre} ${request.apellido}`;
+            
+            const modalContent = document.getElementById('modal-content');
+            modalContent.innerHTML = `
+                <div class="detail-row">
+                    <strong>RUT:</strong> ${request.rut}
+                </div>
+                <div class="detail-row">
+                    <strong>Email:</strong> ${request.email}
+                </div>
+                <div class="detail-row">
+                    <strong>Malla:</strong> ${request.malla}
+                </div>
+                <div class="detail-row">
+                    <strong>Ramos solicitados:</strong> ${request.ramos.join(', ')}
+                </div>
+                <div class="detail-row">
+                    <strong>Tipo de solicitud:</strong> ${request.tipoSolicitud.join(', ')}
+                </div>
+                <div class="detail-row">
+                    <strong>Situación:</strong> ${request.situacion}
+                </div>
+                <div class="detail-row">
+                    <strong>Profesor Encargado:</strong>
+                    <select class="modal-professor-select" id="modal-professor-select">
+                        <option value="">Sin asignar</option>
+                        ${profesores.map(profesor => 
+                            `<option value="${profesor}" ${request.profesorEncargado === profesor ? 'selected' : ''}>${profesor}</option>`
+                        ).join('')}
+                    </select>
+                </div>
+                ${request.comentarios ? `
+                <div class="detail-row">
+                    <strong>Comentarios:</strong> ${request.comentarios}
+                </div>
+                ` : ''}
+            `;
+            
+            document.getElementById('modal-professor-select').addEventListener('change', function() {
+                updateRequestProfessor(request.id, this.value);
+                // Actualizar también en la tabla
+                renderRequestsTable();
+            });
+            
+            document.getElementById('modal-overlay').style.display = 'flex';
+        }
+
+        // Actualizar estado de la solicitud
+        function updateRequestStatus(id, newStatus) {
+            const request = requests.find(r => r.id === id);
+            if (request) {
+                request.estado = newStatus;
+                renderRequestsTable();
+            }
+        }
+
+        // Actualizar profesor encargado
+        function updateRequestProfessor(id, profesor) {
+            const request = requests.find(r => r.id === id);
+            if (request) {
+                request.profesorEncargado = profesor;
+                // No es necesario re-renderizar toda la tabla aquí porque el select ya muestra el valor actualizado
+            }
+        }
+
+        // Actualizar estadísticas
+        function updateStats() {
+            const total = requests.length;
+            const pendientes = requests.filter(r => r.estado === 'Pendiente').length;
+            const aprobadas = requests.filter(r => r.estado === 'Aprobada').length;
+            const rechazadas = requests.filter(r => r.estado === 'Rechazada').length;
+            
+            // Actualizar contador en el sidebar
+            document.getElementById('request-count').textContent = pendientes;
+            
+            // Actualizar tarjetas de estadísticas
+            document.querySelectorAll('.stat-card .stat-value')[0].textContent = total;
+            document.querySelectorAll('.stat-card .stat-value')[1].textContent = pendientes;
+            document.querySelectorAll('.stat-card .stat-value')[2].textContent = aprobadas;
+            document.querySelectorAll('.stat-card .stat-value')[3].textContent = rechazadas;
+        }
+    </script>
+</body>
+</html>
